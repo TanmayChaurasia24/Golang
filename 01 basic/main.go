@@ -1,4 +1,4 @@
-package main // main is the package which every program use
+package main 
 import "fmt"
 
 func main() {
