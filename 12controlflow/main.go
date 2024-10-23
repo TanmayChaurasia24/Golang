@@ -35,4 +35,10 @@ func main() {
 
 	fmt.Println(result)
 
+	// initializing num and then checking
+	if num := 3; num < 10 {
+		fmt.Println("num is less than 10")
+	} else {
+		fmt.Println("num is greater than 10")
+	}
 }
