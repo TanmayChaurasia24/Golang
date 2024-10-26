@@ -9,7 +9,8 @@ import (
 
 func main() {
 	fmt.Println("making req in golang")
-	PerformGetRequest()
+	// PerformGetRequest()
+	PerformPostRequest()
 
 }
 
@@ -40,3 +41,26 @@ func PerformGetRequest() {
 // status code: 200
 // content length: 9
 // home page
+
+func PerformPostRequest() {
+	const url = "http://localhost:3000/post"
+
+	requestBody := strings.NewReader(`
+		{
+			"coursename": "golang",
+			"price": 100,
+			"platform": "youtube"
+		}
+	`)
+
+	response, err := http.Post(url, "application/json", requestBody)
+	if err != nil {
+		panic(err)
+	}
+	defer response.Body.Close()
+	content, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(content))
+}
