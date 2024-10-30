@@ -6,6 +6,7 @@ import (
 	"math/rand"     // Package to generate random numbers
 	"net/http"      // Package to create HTTP servers and handle requests
 	"strconv"       // Package to convert data types
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -29,7 +30,8 @@ var courses []Course
 
 // Middleware function to check if a course is empty
 func isEmpty(c *Course) bool {
-	return c.CourseId == "" && c.CourseName == ""
+	// return c.CourseId == "" && c.CourseName == ""
+	return c.CourseName == ""
 }
 
 // main function is the entry point of the application.
@@ -44,7 +46,9 @@ func main() {
 	http.HandleFunc("/", serveHome)
 	http.HandleFunc("/courses", getAllCourses)
 	http.HandleFunc("/course", createCourse)
+	http.HandleFunc("/genaratecourse", createonecourse)
 	http.HandleFunc("/course/", getCourseById)
+	http.HandleFunc("/deletecourse", deleteonecourse)
 
 	// Start the HTTP server on port 8080
 	http.ListenAndServe(":8080", nil)
@@ -112,4 +116,46 @@ func createCourse(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(newCourse) // Send the new course as a JSON response
+}
+
+func createonecourse(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Adding a new course")
+	w.Header().Set("content-type", "application/json")
+
+	// what if course body is empty that we are adding
+	if r.Body == nil {
+		json.NewEncoder(w).Encode("please give the important information about the course")
+	}
+
+	// when {} is comming in data
+	var course Course
+	_ = json.NewDecoder(r.Body).Decode(&course)
+
+	if isEmpty(&course) {
+		json.NewEncoder(w).Encode("please give the correct information for the course")
+		return
+	}
+
+	// generating the random course id for the course and convert it into the string
+	rand.Seed(time.Now().UnixNano())
+	course.CourseId = strconv.Itoa(rand.Intn(100)) // itoa converts the int into a string
+	courses = append(courses, course)
+	json.NewEncoder(w).Encode(course)
+	return
+
+}
+
+func deleteonecourse(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("delete one course")
+	w.Header().Set("content-type", "application/json")
+
+	params := mux.Vars(r)
+
+	for index, course := range courses {
+		if course.CourseId == params["id"] {
+			courses = append(courses[:index], courses[index+1:]...)
+			json.NewEncoder(w).Encode("Course deleted successfully")
+			return
+		}
+	}
 }
