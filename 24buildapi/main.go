@@ -42,16 +42,17 @@ func main() {
 	courses = append(courses, Course{CourseId: "1", CourseName: "Go Programming", CoursePrice: 299, Author: &Author{Fullname: "Tanmay Kumar", Website: "https://tanmaykumar.com"}})
 	courses = append(courses, Course{CourseId: "2", CourseName: "Python Programming", CoursePrice: 399, Author: &Author{Fullname: "John Doe", Website: "https://johndoe.com"}})
 
-	// Set up routes for the HTTP server
-	http.HandleFunc("/", serveHome)
-	http.HandleFunc("/courses", getAllCourses)
-	http.HandleFunc("/course", createCourse)
-	http.HandleFunc("/genaratecourse", createonecourse)
-	http.HandleFunc("/course/", getCourseById)
-	http.HandleFunc("/deletecourse", deleteonecourse)
+	r := mux.NewRouter()
+
+	r.HandleFunc("/", serveHome).Methods("GET")
+	r.HandleFunc("/courses", getAllCourses).Methods("GET")
+	r.HandleFunc("/course", createCourse).Methods("POST")
+	r.HandleFunc("/genaratecourse", createonecourse).Methods("POST")
+	r.HandleFunc("/course/{id}", getCourseById).Methods("GET")
+	r.HandleFunc("/deletecourse", deleteonecourse).Methods("DELETE")
 
 	// Start the HTTP server on port 8080
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8080", r)
 }
 
 // serveHome handles requests to the home page.
